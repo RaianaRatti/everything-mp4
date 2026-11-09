@@ -31,7 +31,7 @@ export function SettingsButton() {
         <div
           role="dialog"
           aria-label="Settings"
-          className="absolute top-full right-0 mt-2 w-64 rounded-lg border-3 border-ink bg-card p-3 shadow-pop"
+          className="absolute top-full right-0 mt-2 w-64 rounded-lg border-2 border-ink bg-card p-3 shadow-pop-sm"
         >
           <p className="mb-3 text-xs tracking-wide text-ink-3 uppercase">highlight color</p>
           <div role="radiogroup" aria-label="Highlight color" className="flex gap-2">
@@ -45,7 +45,7 @@ export function SettingsButton() {
                 title={a.label}
                 data-accent={a.id}
                 onClick={() => setAccent(a.id)}
-                className={`size-7 rounded-full border-2 border-ink bg-accent ${
+                className={`size-7 border-2 border-ink bg-accent ${
                   accent === a.id
                     ? "outline-2 outline-offset-2 outline-ink"
                     : "hover:-translate-y-0.5"
@@ -53,10 +53,10 @@ export function SettingsButton() {
               />
             ))}
           </div>
-          <div className="mt-4 border-t-2 border-ink pt-3">
+          <div className="mt-4 border-t border-line pt-3">
             <Downloads />
           </div>
-          <div className="mt-4 border-t-2 border-ink pt-3">
+          <div className="mt-4 border-t border-line pt-3">
             <Licenses />
           </div>
         </div>

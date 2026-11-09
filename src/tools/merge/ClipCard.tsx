@@ -44,10 +44,10 @@ export function ClipCard({
     <section
       onPointerDown={() => select(slot)}
       aria-label={`Video ${slot + 1}`}
-      className={`space-y-4 rounded-lg border-3 border-ink bg-card p-4 ${selected ? "shadow-pop" : ""}`}
+      className={`space-y-4 rounded-lg border-2 border-ink bg-card p-4 ${selected ? "shadow-pop" : ""}`}
     >
       <header className="flex items-start gap-3">
-        <span className="flex size-7 shrink-0 items-center justify-center rounded-md border-2 border-ink bg-accent text-sm">
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-accent text-sm">
           {slot + 1}
         </span>
         <div className="min-w-0 flex-1">
@@ -203,7 +203,7 @@ function TrimBar({
   };
 
   return (
-    <div data-track className="relative h-9 rounded-md border-3 border-ink bg-paper-3 select-none">
+    <div data-track className="relative h-9 rounded-md border-2 border-ink bg-paper-3 select-none">
       <div
         onPointerDown={(e) => drag(e, "range")}
         className="absolute inset-y-0 cursor-grab touch-none bg-accent active:cursor-grabbing"

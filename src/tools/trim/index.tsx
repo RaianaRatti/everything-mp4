@@ -179,7 +179,7 @@ export default function Trim() {
             {ranges.map((r, i) => (
               <div
                 key={i}
-                className={`flex flex-wrap items-end gap-2 rounded-md border-3 p-2 ${
+                className={`flex flex-wrap items-end gap-2 rounded-md border-2 p-2 ${
                   i === active ? "border-ink" : "border-transparent"
                 }`}
                 onFocus={() => setActive(i)}

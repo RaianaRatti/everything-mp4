@@ -145,7 +145,7 @@ export default function Filters() {
                 setLook(l.id);
                 setAdjust({ ...NEUTRAL, ...l.adjust });
               }}
-              className={`rounded-md border-3 border-ink px-1 py-1.5 text-xs ${
+              className={`rounded-md border-2 border-ink px-1 py-1.5 text-xs ${
                 look === l.id ? "bg-accent" : "bg-card hover:bg-paper-2"
               }`}
             >

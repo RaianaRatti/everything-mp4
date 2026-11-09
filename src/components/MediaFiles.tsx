@@ -28,7 +28,7 @@ export function MediaFileList({
       {files.map((f) => (
         <li key={f.id}>
           <div
-            className={`flex items-center gap-3 rounded-md border-3 border-ink bg-card px-3 py-2 ${
+            className={`flex items-center gap-3 rounded-md border-2 border-ink bg-card px-3 py-2 ${
               f.id === selected ? "shadow-pop-sm" : ""
             }`}
           >
@@ -129,7 +129,7 @@ function FileCard({
 
   const src = frame?.file === file ? frame.url : null;
   return (
-    <div className="flex items-center gap-4 rounded-lg border-3 border-ink bg-card p-3 shadow-pop">
+    <div className="flex items-center gap-4 rounded-lg border-2 border-ink bg-card p-3">
       <div className="flex aspect-video w-28 shrink-0 items-center justify-center overflow-hidden rounded-md border-2 border-ink bg-ink sm:w-36">
         {src ? (
           <img src={src} alt="" className="size-full object-cover" />
@@ -139,7 +139,7 @@ function FileCard({
           <AudioLines className="size-6 text-paper" aria-hidden />
         )}
       </div>
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-md border-2 border-ink bg-accent">
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-accent">
         {number}
       </span>
       <div className="min-w-0 flex-1">

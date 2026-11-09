@@ -188,7 +188,7 @@ function MergeExport({ onClose }: { onClose: () => void }) {
 
 function Reading() {
   return (
-    <div className="flex min-h-48 items-center justify-center rounded-xl border-3 border-ink bg-card text-ink-2">
+    <div className="flex min-h-48 items-center justify-center rounded-xl border-2 border-ink bg-card text-ink-2">
       reading video…
     </div>
   );

@@ -76,7 +76,7 @@ export default function Frames() {
 
   const sidebar = media ? (
     <>
-      <div className="divide-y-3 divide-ink rounded-lg border-3 border-ink bg-card">
+      <div className="divide-y divide-line rounded-lg border-2 border-ink bg-card">
         <PanelSection title="what to save">
           <Segmented
             label="What to save"
@@ -250,7 +250,7 @@ function ManyPanel({ media, type }: { media: MediaFile; type: ImageType }) {
 
   return (
     <>
-      <div className="divide-y-3 divide-ink rounded-lg border-3 border-ink bg-card">
+      <div className="divide-y divide-line rounded-lg border-2 border-ink bg-card">
         <PanelSection title="which frames">
           <Select
             label="Which frames"
@@ -356,7 +356,7 @@ function SheetPanel({ media, type }: { media: MediaFile; type: ImageType }) {
 
   return (
     <>
-      <div className="divide-y-3 divide-ink rounded-lg border-3 border-ink bg-card">
+      <div className="divide-y divide-line rounded-lg border-2 border-ink bg-card">
         <PanelSection title="contact sheet">
           <div className="grid grid-cols-2 gap-2">
             <Field label="columns">

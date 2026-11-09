@@ -13,7 +13,7 @@ export function EnginePanel({ reason }: { reason: string }) {
   const size = `${Math.round(ENGINE_BYTES / 1024 ** 2)} MB`;
 
   return (
-    <div className="space-y-3 rounded-lg border-3 border-ink bg-card p-4 shadow-pop-sm">
+    <div className="space-y-3 rounded-lg border-2 border-ink bg-card p-4">
       <p className="flex items-center gap-2">
         <Cpu className="size-5 shrink-0" aria-hidden />
         {status === "loading" ? "loading the video engine…" : "this needs the video engine"}
@@ -24,7 +24,7 @@ export function EnginePanel({ reason }: { reason: string }) {
       </p>
       {status === "loading" ? (
         <div className="space-y-1">
-          <div className="h-4 overflow-hidden rounded-md border-3 border-ink bg-paper-3">
+          <div className="h-4 overflow-hidden rounded-md border-2 border-ink bg-paper-3">
             <div
               className="h-full bg-accent transition-[width] duration-200"
               style={{ width: `${fraction * 100}%` }}
@@ -55,7 +55,7 @@ export function EngineBadge({ choice }: { choice: EngineChoice }) {
   const Icon = choice.copy ? Zap : choice.engine === "browser" ? Gauge : Cpu;
   return (
     <div
-      className={`space-y-1 rounded-md border-3 p-3 text-sm ${
+      className={`space-y-1 rounded-md border-2 p-3 text-sm ${
         choice.engine === null ? "border-red-600 bg-red-50" : "border-ink bg-paper-2"
       }`}
     >

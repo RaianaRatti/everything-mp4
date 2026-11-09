@@ -124,7 +124,7 @@ export default function ExtractAudio() {
   const sidebar =
     media && info && audio && choice ? (
       <>
-        <div className="divide-y-3 divide-ink rounded-lg border-3 border-ink bg-card">
+        <div className="divide-y divide-line rounded-lg border-2 border-ink bg-card">
           <PanelSection title="save as">
             <Select
               label="Audio format"

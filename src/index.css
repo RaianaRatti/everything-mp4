@@ -3,15 +3,25 @@
 @theme {
   --font-sans: "Pixelify Sans", ui-monospace, monospace;
 
-  --color-paper: #fbfaf7;
-  --color-paper-2: #f6f4ef;
-  --color-paper-3: #eeebe4;
+  /* Plain neutral greys: the accent is the only color on the page. */
+  --color-paper: #fafafa;
+  --color-paper-2: #f2f2f2;
+  --color-paper-3: #e6e6e6;
   --color-card: #ffffff;
-  --color-line: #1c1b1a;
+  /* Hairline for quiet dividers; boxes keep the ink border. */
+  --color-line: #e2e2e2;
   --color-line-strong: #1c1b1a;
   --color-ink: #1c1b1a;
   --color-ink-2: #45423e;
   --color-ink-3: #77736d;
+
+  /* Pixel look: every rounded-* utility draws a square corner. */
+  --radius-xs: 0;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
 
   /* User-picked highlight; swapped at runtime via <html data-accent>. */
   --color-accent: #f9c6d8;
@@ -37,34 +47,45 @@
   --color-accent: #cfcfcf;
 }
 
-/* Hard offset shadow in the accent color (falls bottom-left), for boxes that should pop. */
+/*
+ * Hard offset shadow in the accent color (falls bottom-left). Used sparingly: to mark the selected
+ * item and to lift floating menus off the page. Static boxes stay flat.
+ */
 @utility shadow-pop {
-  box-shadow: -6px 6px 0 0 var(--color-accent);
+  box-shadow: -5px 5px 0 0 var(--color-accent);
 }
 @utility shadow-pop-sm {
-  box-shadow: -4px 4px 0 0 var(--color-accent);
+  box-shadow: -3px 3px 0 0 var(--color-accent);
 }
 
-/* Lifts away from its shadow on hover and presses into it on click. Pair with shadow-pop(-sm). */
+/*
+ * Flat at rest; lifts onto an accent shadow on hover and presses back flat on click. Stepped
+ * timing so it snaps between frames like a sprite instead of gliding.
+ */
 @utility pop-press {
   transition:
-    translate 120ms ease-out,
-    box-shadow 120ms ease-out;
+    translate 120ms steps(2, end),
+    box-shadow 120ms steps(2, end);
   &:hover:not(:disabled) {
     translate: 2px -2px;
-    box-shadow: -8px 8px 0 0 var(--color-accent);
+    box-shadow: -4px 4px 0 0 var(--color-accent);
   }
   &:active:not(:disabled) {
-    translate: -4px 4px;
+    translate: 0 0;
     box-shadow: 0 0 0 0 var(--color-accent);
   }
 }
 
 body {
   @apply bg-paper font-sans text-ink;
-  /* Faint dot grid, like graph paper. */
-  background-image: radial-gradient(var(--color-paper-3) 1.5px, transparent 1.5px);
-  background-size: 18px 18px;
+}
+
+/* Icons drawn on the pixel grid: aliased edges, square stroke ends, sharp joins. */
+svg.lucide,
+svg.pixel {
+  shape-rendering: crispEdges;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
 }
 
 ::selection {

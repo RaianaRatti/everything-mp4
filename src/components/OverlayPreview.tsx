@@ -30,7 +30,7 @@ export function OverlayPreview({
   if (!url) return null;
   return (
     <div
-      className="relative mx-auto overflow-hidden rounded-md border-3 border-ink bg-black"
+      className="relative mx-auto overflow-hidden rounded-md border-2 border-ink bg-black"
       style={{
         aspectRatio: `${width} / ${height}`,
         width: `min(100%, calc(60vh * ${width / height}))`,

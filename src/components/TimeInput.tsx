@@ -37,7 +37,7 @@ export function TimeInput({
           }
         }}
         aria-invalid={invalid}
-        className={`w-28 rounded-md border-3 bg-card px-2 py-1.5 text-sm tabular-nums focus:outline-2 focus:outline-offset-1 focus:outline-ink ${
+        className={`w-28 rounded-md border-2 bg-card px-2 py-1.5 text-sm tabular-nums focus:outline-2 focus:outline-offset-1 focus:outline-ink ${
           invalid ? "border-red-600" : "border-ink"
         }`}
       />

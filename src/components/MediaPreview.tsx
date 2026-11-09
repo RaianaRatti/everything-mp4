@@ -132,7 +132,7 @@ function Player({
   if (failed) {
     return (
       fallback ?? (
-        <div className="rounded-md border-3 border-ink bg-card p-5 text-sm text-ink-2">
+        <div className="rounded-md border-2 border-ink bg-card p-5 text-sm text-ink-2">
           This browser can't play this file, but the tools may still be able to work with it.
         </div>
       )
@@ -144,8 +144,8 @@ function Player({
       <div
         className={
           kind === "video"
-            ? `relative flex ${small ? "h-[min(40vh,320px)]" : "h-[min(52vh,560px)]"} min-h-48 items-center justify-center overflow-hidden rounded-md border-3 border-ink bg-black shadow-pop`
-            : "relative flex h-28 items-center justify-center rounded-md border-3 border-ink bg-card shadow-pop"
+            ? `relative flex ${small ? "h-[min(40vh,320px)]" : "h-[min(52vh,560px)]"} min-h-48 items-center justify-center overflow-hidden rounded-md border-2 border-ink bg-black`
+            : "relative flex h-28 items-center justify-center rounded-md border-2 border-ink bg-card"
         }
       >
         {kind === "audio" && <AudioLines className="size-10 text-ink-3" aria-hidden />}
@@ -173,7 +173,7 @@ function Player({
           onClick={() => local.current && toggle(local.current)}
           aria-label={playing ? "Pause" : "Play"}
           title={playing ? "Pause (space)" : "Play (space)"}
-          className="pop-press flex size-10 shrink-0 items-center justify-center rounded-md border-3 border-ink bg-ink text-paper shadow-pop-sm"
+          className="pop-press flex size-10 shrink-0 items-center justify-center rounded-md border-2 border-ink bg-ink text-paper"
         >
           {playing ? <Pause className="size-5" /> : <Play className="size-5" />}
         </button>
@@ -200,7 +200,7 @@ function Player({
           aria-label={silent ? "Unmute" : "Mute"}
           aria-pressed={silent}
           title={silent ? "Unmute" : "Mute"}
-          className="flex size-10 shrink-0 items-center justify-center rounded-md border-3 border-ink bg-card hover:bg-accent"
+          className="flex size-10 shrink-0 items-center justify-center rounded-md border-2 border-ink bg-card hover:bg-accent"
         >
           {silent ? <VolumeX className="size-5" /> : <Volume2 className="size-5" />}
         </button>

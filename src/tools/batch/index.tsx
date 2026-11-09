@@ -140,7 +140,7 @@ export default function Batch() {
   const done = items.filter((i) => i.result);
   const sidebar = (
     <>
-      <div className="divide-y-3 divide-ink rounded-lg border-3 border-ink bg-card">
+      <div className="divide-y divide-line rounded-lg border-2 border-ink bg-card">
         <PanelSection title="task">
           <Select
             label="Task"
@@ -280,7 +280,7 @@ export default function Batch() {
           setOver(false);
           void filesFromDrop(e).then(add);
         }}
-        className={`flex flex-col items-center gap-3 rounded-xl border-3 border-dashed border-ink px-6 py-10 text-center ${
+        className={`flex flex-col items-center gap-3 rounded-xl border-2 border-dashed border-ink px-6 py-10 text-center ${
           over ? "bg-accent" : "bg-card"
         }`}
       >
@@ -289,7 +289,7 @@ export default function Batch() {
           <FilePickerButton accept={acceptFor(kinds)} onFiles={add}>
             choose files
           </FilePickerButton>
-          <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border-3 border-ink bg-card px-3 py-2 text-sm hover:bg-accent">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border-2 border-ink bg-card px-3 py-2 text-sm hover:bg-accent">
             <FolderOpen className="size-4" /> choose a folder
             <input
               type="file"
@@ -306,7 +306,7 @@ export default function Batch() {
       {items.length > 0 && (
         <ul className="space-y-1">
           {items.map((item) => (
-            <li key={item.id} className="flex flex-wrap items-center gap-2 rounded-md border-3 border-ink bg-card p-2 text-sm">
+            <li key={item.id} className="flex flex-wrap items-center gap-2 rounded-md border-2 border-ink bg-card p-2 text-sm">
               <span className="min-w-0 flex-1 truncate" title={item.file.name}>
                 {item.file.name}
               </span>

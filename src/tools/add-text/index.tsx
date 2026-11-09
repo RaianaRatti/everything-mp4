@@ -266,7 +266,7 @@ export default function AddText() {
               {layers.map((l, i) => (
                 <span
                   key={l.id}
-                  className={`inline-flex items-center gap-1 rounded-md border-3 border-ink px-2 py-1 text-sm ${
+                  className={`inline-flex items-center gap-1 rounded-md border-2 border-ink px-2 py-1 text-sm ${
                     i === active ? "bg-accent" : "bg-card"
                   }`}
                 >

@@ -123,7 +123,7 @@ export function Timeline({
           onSeek(at(e.clientX));
           drag(onSeek)(e);
         }}
-        className="relative h-14 cursor-pointer overflow-hidden rounded-md border-3 border-ink bg-paper-2"
+        className="relative h-14 cursor-pointer overflow-hidden rounded-md border-2 border-ink bg-paper-2"
       >
         {ranges.map((r, i) => (
           <div

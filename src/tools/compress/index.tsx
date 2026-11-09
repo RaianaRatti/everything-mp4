@@ -111,7 +111,7 @@ export default function Compress() {
   const sidebar =
     media && info && plan && choice ? (
       <>
-        <div className="divide-y-3 divide-ink rounded-lg border-3 border-ink bg-card">
+        <div className="divide-y divide-line rounded-lg border-2 border-ink bg-card">
           <PanelSection title="compress by">
             <Segmented label="Compress by" value={kind} options={MODES} onChange={setKind} />
             {kind === "size" && (
@@ -124,7 +124,7 @@ export default function Compress() {
                       aria-pressed={megabytes === mb}
                       disabled={mb * MB >= info.size}
                       onClick={() => setMegabytes(mb)}
-                      className={`rounded-md border-3 border-ink px-1 py-1.5 text-sm disabled:border-ink-3 disabled:text-ink-3 ${
+                      className={`rounded-md border-2 border-ink px-1 py-1.5 text-sm disabled:border-ink-3 disabled:text-ink-3 ${
                         megabytes === mb ? "bg-accent" : "bg-card hover:bg-paper-2"
                       }`}
                     >

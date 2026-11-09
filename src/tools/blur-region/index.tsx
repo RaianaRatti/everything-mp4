@@ -1,4 +1,4 @@
-import { Plus, X } from "lucide-react";
+import { BookOpen, Plus, X } from "lucide-react";
 import {
   useEffect,
   useRef,
@@ -189,6 +189,7 @@ export default function BlurRegion() {
   const [stroke, setStroke] = useState<{ x: number; y: number }[] | null>(null);
   /** Whether the active region is picked on the video (outlined, with handles). */
   const [picked, setPicked] = useState(false);
+  const [pinHelp, setPinHelp] = useState(false);
   const stage = useRef<HTMLDivElement>(null);
   const videoEl = useRef<HTMLVideoElement>(null);
 
@@ -393,33 +394,84 @@ export default function BlurRegion() {
                 duration={duration}
                 onChange={(r) => update(r)}
               />
-              <div className="space-y-1">
-                <Button
-                  onClick={() =>
-                    update({
-                      keys: [
-                        ...region.keys.filter((k) => Math.abs(k.t - time) > 0.05),
-                        { t: time, x: region.x, y: region.y },
-                      ],
-                    })
-                  }
-                >
-                  pin this position at {formatTime(time)}
-                </Button>
-                <p className="text-xs text-ink-3">
-                  For something that moves: pin its position at a few times and the region slides
-                  between them.
-                </p>
-                {region.keys.length > 0 && (
-                  <Button variant="ghost" onClick={() => update({ keys: [] })}>
-                    clear {region.keys.length} pinned positions
-                  </Button>
-                )}
-              </div>
             </>
           )}
         </div>
       </PanelSection>
+      {region && (
+        <PanelSection>
+          <div data-region-settings className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-xs tracking-wide text-ink-3 uppercase">pinned positions</p>
+              <button
+                type="button"
+                aria-expanded={pinHelp}
+                aria-label="What are pinned positions?"
+                title="What are pinned positions?"
+                onClick={() => setPinHelp(!pinHelp)}
+                className={`rounded-md p-1 hover:bg-accent ${pinHelp ? "bg-accent" : ""}`}
+              >
+                <BookOpen className="size-4" />
+              </button>
+            </div>
+            {pinHelp && (
+              <p className="rounded-md border-2 border-ink bg-paper-2 p-3 text-sm leading-relaxed text-ink-2">
+                For something that moves, like a face or a license plate. Pause where it is, move
+                the region over it, and pin that spot. Do this at a few moments and the region
+                slides from one pin to the next as the video plays.
+              </p>
+            )}
+            <Button
+              onClick={() =>
+                update({
+                  keys: [
+                    ...region.keys.filter((k) => Math.abs(k.t - time) > 0.05),
+                    { t: time, x: region.x, y: region.y },
+                  ],
+                })
+              }
+            >
+              pin this position at {formatTime(time)}
+            </Button>
+            {region.keys.length > 0 && (
+              <>
+                <ol className="space-y-1">
+                  {[...region.keys]
+                    .sort((a, b) => a.t - b.t)
+                    .map((k, n) => (
+                      <li
+                        key={k.t}
+                        className="flex items-center gap-2 rounded-md border-2 border-ink bg-card px-2 py-1 text-sm"
+                      >
+                        <button
+                          type="button"
+                          className="flex-1 text-left hover:underline"
+                          title="jump to this time"
+                          onClick={() => {
+                            if (videoEl.current) videoEl.current.currentTime = k.t;
+                            setTime(k.t);
+                          }}
+                        >
+                          {n + 1}. at {formatTime(k.t)}
+                        </button>
+                        <button
+                          type="button"
+                          aria-label={`Remove pinned position ${n + 1}`}
+                          onClick={() => update({ keys: region.keys.filter((x) => x.t !== k.t) })}
+                        >
+                          <X className="size-3.5" />
+                        </button>
+                      </li>
+                    ))}
+                </ol>
+                <Button variant="ghost" onClick={() => update({ keys: [] })}>
+                  clear all {region.keys.length} pinned positions
+                </Button>
+              </>
+            )}
+          </div>
+        </PanelSection>
+      )}
       {media.info.audio.length > 0 && (
         <PanelSection title="sound while hidden">
           <Select
@@ -607,7 +659,7 @@ export default function BlurRegion() {
                         <span
                           key={corner}
                           onPointerDown={(e) => startDrag(e, i, corner)}
-                          className={`absolute size-3 touch-none rounded-[2px] border-2 border-ink bg-accent ${cornerClass[corner]}`}
+                          className={`absolute size-3 touch-none rounded-none border-2 border-ink bg-accent ${cornerClass[corner]}`}
                         />
                       ))}
                   </div>
@@ -656,7 +708,7 @@ export default function BlurRegion() {
                 <span
                   key={r.id}
                   data-region
-                  className={`inline-flex items-center gap-1 rounded-md border-3 border-ink px-2 py-1 text-sm ${
+                  className={`inline-flex items-center gap-1 rounded-md border-2 border-ink px-2 py-1 text-sm ${
                     i === active ? "bg-accent" : "bg-card"
                   }`}
                 >

@@ -95,7 +95,7 @@ export function Stage() {
   return (
     <div ref={container} className="flex h-[min(58vh,640px)] min-h-56 items-center justify-center">
       <div
-        className="relative overflow-hidden rounded-md border-3 border-ink bg-black shadow-pop"
+        className="relative overflow-hidden rounded-md border-2 border-ink bg-black"
         style={{ width: box.width, height: box.height }}
       >
         <canvas ref={canvasRef} className="size-full" />
@@ -134,7 +134,7 @@ export function Stage() {
                   <span
                     key={corner}
                     onPointerDown={(e) => startDrag(e, slot, corner)}
-                    className={`absolute size-3 touch-none rounded-[2px] border-2 border-ink bg-accent ${cornerClass[corner]}`}
+                    className={`absolute size-3 touch-none rounded-none border-2 border-ink bg-accent ${cornerClass[corner]}`}
                   />
                 ))}
             </div>

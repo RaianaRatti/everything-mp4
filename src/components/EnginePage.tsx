@@ -86,9 +86,9 @@ export function EnginePage({
 
   const sidebar = media.length ? (
     <>
-      {before && <div className="rounded-lg border-3 border-ink bg-card">{before}</div>}
+      {before && <div className="rounded-lg border-2 border-ink bg-card">{before}</div>}
       {settings && (
-        <div className="divide-y-3 divide-ink rounded-lg border-3 border-ink bg-card">
+        <div className="divide-y divide-line rounded-lg border-2 border-ink bg-card">
           {settings}
         </div>
       )}

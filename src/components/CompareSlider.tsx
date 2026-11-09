@@ -46,7 +46,7 @@ export function CompareSlider({ before, after }: { before: Blob; after: Blob }) 
   if (!beforeUrl || !afterUrl) return null;
   return (
     <div className="space-y-2">
-      <div className="relative overflow-hidden rounded-md border-3 border-ink bg-black">
+      <div className="relative overflow-hidden rounded-md border-2 border-ink bg-black">
         <video ref={beforeRef} src={beforeUrl} muted loop playsInline className="block w-full" />
         <video
           ref={afterRef}
@@ -78,7 +78,7 @@ export function CompareSlider({ before, after }: { before: Blob; after: Blob }) 
             else a.pause();
           }}
           aria-label={playing ? "Pause" : "Play"}
-          className="pop-press flex size-9 shrink-0 items-center justify-center rounded-md border-3 border-ink bg-ink text-paper shadow-pop-sm"
+          className="pop-press flex size-9 shrink-0 items-center justify-center rounded-md border-2 border-ink bg-ink text-paper"
         >
           {playing ? <Pause className="size-4" /> : <Play className="size-4" />}
         </button>

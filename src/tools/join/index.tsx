@@ -245,7 +245,7 @@ export default function Join() {
       {clips.length > 0 && (
         <ol className="space-y-2">
           {clips.map((c, i) => (
-            <li key={c.media.id} className="space-y-2 rounded-lg border-3 border-ink bg-card p-3">
+            <li key={c.media.id} className="space-y-2 rounded-lg border-2 border-ink bg-card p-3">
               <div className="flex items-center gap-2">
                 <span className="text-sm">{i + 1}.</span>
                 <div className="min-w-0 flex-1">

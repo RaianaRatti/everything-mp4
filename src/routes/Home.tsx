@@ -37,36 +37,18 @@ export function Home() {
       }}
     >
       {over && (
-        <div className="pointer-events-none fixed inset-3 z-40 flex items-center justify-center rounded-xl border-3 border-dashed border-ink bg-accent/80 text-2xl">
+        <div className="pointer-events-none fixed inset-3 z-40 flex items-center justify-center rounded-xl border-2 border-dashed border-ink bg-accent/80 text-2xl">
           <Upload className="mr-3 size-6" /> drop a file to see what you can do with it
         </div>
       )}
       <header className="flex items-center gap-2.5 border-b border-ink bg-card py-4 pr-14 pl-5 sm:pl-8">
-        <svg viewBox="0 0 32 32" className="size-6 text-ink" aria-hidden>
-          <rect
-            x="3"
-            y="6"
-            width="26"
-            height="20"
-            rx="2"
-            fill="#fff"
-            stroke="currentColor"
-            strokeWidth="2"
-          />
-          <path
-            d="M13 11.5v9l7.5-4.5z"
-            fill="var(--color-accent)"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <Logo />
         <span className="text-lg">everything-mp4</span>
       </header>
 
-      <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-10 px-5 py-10 sm:px-8 sm:py-14">
-        <div className="space-y-5">
-          <div className="space-y-3">
+      <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-12 px-5 py-12 sm:px-8 sm:py-16">
+        <div className="space-y-6">
+          <div className="space-y-2">
             <h1 className="text-4xl leading-tight sm:text-5xl">everything-mp4</h1>
             <p className="text-ink-2">Video tools that run in your browser.</p>
           </div>
@@ -85,7 +67,7 @@ export function Home() {
                 if (e.key === "Enter" && searching && results[0]) navigate(`/${results[0].id}`);
               }}
               placeholder="search tools: compress, mp3, gif…"
-              className="w-full rounded-md border-3 border-ink bg-card py-2.5 pr-10 pl-9 shadow-pop-sm focus:outline-2 focus:outline-offset-2 focus:outline-ink [&::-webkit-search-cancel-button]:hidden"
+              className="w-full rounded-md border-2 border-ink bg-card py-2.5 pr-10 pl-9 focus:outline-2 focus:outline-offset-2 focus:outline-ink [&::-webkit-search-cancel-button]:hidden"
             />
             {searching && (
               <button
@@ -101,7 +83,7 @@ export function Home() {
         </div>
 
         {dropped && (
-          <section className="space-y-3 rounded-lg border-3 border-ink bg-card p-4 shadow-pop-sm">
+          <section className="space-y-3 rounded-lg border-2 border-ink bg-card p-4">
             <div className="flex items-start justify-between gap-2">
               <p>
                 {kind
@@ -118,7 +100,7 @@ export function Home() {
                   key={t.id}
                   type="button"
                   onClick={() => open(t.id)}
-                  className="rounded-md border-3 border-ink bg-card px-3 py-1.5 text-sm hover:bg-accent"
+                  className="rounded-md border-2 border-ink bg-card px-3 py-1.5 text-sm hover:bg-accent"
                 >
                   {t.label}
                 </button>
@@ -145,12 +127,9 @@ export function Home() {
                   id={`cat-${c}`}
                   className="mb-4 flex items-center gap-2.5 text-sm text-ink-2 lowercase"
                 >
-                  <span
-                    className="size-2.5 rounded-full border-2 border-ink bg-accent"
-                    aria-hidden
-                  />
+                  <span className="size-2 bg-accent" aria-hidden />
                   {category}
-                  <span className="h-px flex-1 bg-ink" aria-hidden />
+                  <span className="h-px flex-1 bg-line" aria-hidden />
                 </h2>
                 <ToolGrid list={list} />
               </section>
@@ -183,10 +162,10 @@ function ToolCard({ tool, number }: { tool: Tool; number: number }) {
     <Link
       to={`/${tool.id}`}
       title={tool.description}
-      className="group pop-press flex h-32 flex-col justify-between rounded-lg border-3 border-ink bg-card p-3 shadow-pop focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+      className="group pop-press flex h-32 flex-col justify-between rounded-lg border-2 border-ink bg-card p-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
     >
       <span className="flex items-start justify-between">
-        <span className="flex size-9 items-center justify-center rounded-md border-2 border-ink bg-accent">
+        <span className="flex size-9 items-center justify-center rounded-md bg-accent">
           <Icon className="size-5 text-ink" aria-hidden />
         </span>
         <span className="text-xs text-ink-3">{String(number).padStart(2, "0")}</span>
@@ -201,5 +180,28 @@ function ToolCard({ tool, number }: { tool: Tool; number: number }) {
         </span>
       </span>
     </Link>
+  );
+}
+
+function Logo() {
+  return (
+    <svg viewBox="0 0 32 32" className="pixel size-6 shrink-0 text-ink" aria-hidden>
+      <rect
+        x="3"
+        y="6"
+        width="26"
+        height="20"
+        fill="#fff"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      <path
+        d="M13 11.5v9l7.5-4.5z"
+        fill="var(--color-accent)"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }

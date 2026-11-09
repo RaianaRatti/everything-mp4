@@ -255,7 +255,7 @@ export default function Record() {
   const busy = state !== "idle";
   const sidebar = (
     <>
-      <div className="divide-y-3 divide-ink rounded-lg border-3 border-ink bg-card">
+      <div className="divide-y divide-line rounded-lg border-2 border-ink bg-card">
         <PanelSection title="record">
           <Select
             label="What to record"
@@ -315,7 +315,7 @@ export default function Record() {
   return (
     <ToolLayout toolId="record" sidebar={sidebar}>
       {recovered && !busy && !result && (
-        <div className="flex flex-wrap items-center gap-2 rounded-md border-3 border-ink bg-paper-2 p-3 text-sm">
+        <div className="flex flex-wrap items-center gap-2 rounded-md border-2 border-ink bg-paper-2 p-3 text-sm">
           A recording from last time didn't finish.
           <Button onClick={() => downloadBlob(recovered, "recovered-recording.webm")}>save it</Button>
           <Button
@@ -330,20 +330,20 @@ export default function Record() {
         </div>
       )}
       {error && <p className="text-sm text-red-700">{error}</p>}
-      <div className={`relative overflow-hidden rounded-md border-3 border-ink bg-black ${busy && mode !== "voice" ? "" : "hidden"}`}>
+      <div className={`relative overflow-hidden rounded-md border-2 border-ink bg-black ${busy && mode !== "voice" ? "" : "hidden"}`}>
         <video ref={live} autoPlay muted playsInline className="max-h-[50vh] w-full" />
         {state === "countdown" && (
           <p className="absolute inset-0 flex items-center justify-center text-8xl text-white">{count}</p>
         )}
       </div>
       {busy && (
-        <div className="space-y-3 rounded-lg border-3 border-ink bg-card p-4">
+        <div className="space-y-3 rounded-lg border-2 border-ink bg-card p-4">
           {mode === "voice" && state === "countdown" && <p className="text-5xl">{count}</p>}
           <p className="flex items-center gap-2 text-2xl">
             <Circle className={`size-4 fill-red-600 text-red-600 ${state === "recording" ? "animate-pulse" : ""}`} />
             {formatTime(elapsed, 0)} {state === "paused" && "(paused)"}
           </p>
-          <div className="h-3 overflow-hidden rounded border-2 border-ink bg-paper-3" aria-label="Sound level">
+          <div className="h-3 overflow-hidden rounded-sm border-2 border-ink bg-paper-3" aria-label="Sound level">
             <div ref={meter} className="h-full bg-accent" style={{ width: 0 }} />
           </div>
           {state !== "countdown" && (

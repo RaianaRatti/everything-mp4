@@ -174,7 +174,7 @@ export default function SubtitleEditor() {
 
   const sidebar = cues ? (
     <>
-      <div className="divide-y-3 divide-ink rounded-lg border-3 border-ink bg-card">
+      <div className="divide-y divide-line rounded-lg border-2 border-ink bg-card">
         <PanelSection title="save">
           <Select
             label="Format"
@@ -278,7 +278,7 @@ export default function SubtitleEditor() {
   return (
     <ToolLayout toolId="subtitle-editor" sidebar={sidebar}>
       {url ? (
-        <div className="relative overflow-hidden rounded-md border-3 border-ink bg-black">
+        <div className="relative overflow-hidden rounded-md border-2 border-ink bg-black">
           <video
             ref={videoRef}
             src={url}
@@ -291,7 +291,7 @@ export default function SubtitleEditor() {
           />
           {current && (
             <p className="pointer-events-none absolute inset-x-0 bottom-14 text-center">
-              <span className="rounded bg-black/70 px-2 py-1 whitespace-pre-line text-white">{current.text}</span>
+              <span className="rounded-sm bg-black/70 px-2 py-1 whitespace-pre-line text-white">{current.text}</span>
             </p>
           )}
         </div>
@@ -339,7 +339,7 @@ export default function SubtitleEditor() {
                   key={i}
                   onFocus={() => setActive(i)}
                   onClick={() => setActive(i)}
-                  className={`space-y-2 rounded-md border-3 p-2 ${i === active ? "border-ink bg-card" : "border-transparent"}`}
+                  className={`space-y-2 rounded-md border-2 p-2 ${i === active ? "border-ink bg-card" : "border-transparent"}`}
                 >
                   <div className="flex flex-wrap items-end gap-2">
                     <span className="pb-2 text-xs text-ink-3">{i + 1}</span>

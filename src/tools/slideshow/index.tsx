@@ -116,7 +116,7 @@ export default function Slideshow() {
 
   const sidebar = n ? (
     <>
-      <div className="divide-y-3 divide-ink rounded-lg border-3 border-ink bg-card">
+      <div className="divide-y divide-line rounded-lg border-2 border-ink bg-card">
         <PanelSection title="slideshow">
           <Segmented
             label="Shape"
@@ -246,8 +246,8 @@ export default function Slideshow() {
           </div>
           <ol className="space-y-2">
             {slides.map((s, i) => (
-              <li key={s.id} className="flex items-center gap-3 rounded-lg border-3 border-ink bg-card p-2">
-                <img src={s.url} alt="" className="size-16 shrink-0 rounded object-cover" />
+              <li key={s.id} className="flex items-center gap-3 rounded-lg border-2 border-ink bg-card p-2">
+                <img src={s.url} alt="" className="size-16 shrink-0 rounded-sm object-cover" />
                 <div className="min-w-0 flex-1 space-y-1">
                   <input
                     value={s.caption}

@@ -18,7 +18,7 @@ export function Transport() {
           onClick={() => player.toggle()}
           aria-label={playing ? "Pause" : "Play"}
           title={playing ? "Pause (space)" : "Play (space)"}
-          className="pop-press flex size-10 shrink-0 items-center justify-center rounded-md border-3 border-ink bg-ink text-paper shadow-pop-sm"
+          className="pop-press flex size-10 shrink-0 items-center justify-center rounded-md border-2 border-ink bg-ink text-paper"
         >
           {playing ? <Pause className="size-5" /> : <Play className="size-5" />}
         </button>

@@ -155,7 +155,7 @@ export default function Metadata() {
       {tags && !stripAll && (
         <div className="space-y-4">
           {location.length > 0 && (
-            <div className="space-y-2 rounded-md border-3 border-red-600 bg-red-50 p-3">
+            <div className="space-y-2 rounded-md border-2 border-red-600 bg-red-50 p-3">
               <p className="flex items-center gap-2 text-sm">
                 <MapPin className="size-4" /> This file records where it was made.
               </p>
@@ -165,7 +165,7 @@ export default function Metadata() {
             </div>
           )}
           {device.length > 0 && (
-            <div className="space-y-2 rounded-md border-3 border-ink bg-paper-2 p-3">
+            <div className="space-y-2 rounded-md border-2 border-ink bg-paper-2 p-3">
               <p className="flex items-center gap-2 text-sm">
                 <Smartphone className="size-4" />
                 {device.map((t) => t.value).join(" · ")}

@@ -62,7 +62,7 @@ export function ActionButton({
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className="pop-press w-full rounded-md border-3 border-ink bg-ink px-4 py-3 text-paper shadow-pop-sm disabled:cursor-not-allowed disabled:border-ink-3 disabled:bg-paper-2 disabled:text-ink-3 disabled:shadow-none"
+      className="pop-press w-full rounded-md border-2 border-ink bg-ink px-4 py-3 text-paper disabled:cursor-not-allowed disabled:border-ink-3 disabled:bg-paper-2 disabled:text-ink-3 disabled:shadow-none"
     >
       {children}
     </button>

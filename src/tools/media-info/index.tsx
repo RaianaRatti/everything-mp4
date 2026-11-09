@@ -111,7 +111,7 @@ function Thumb({ entry }: { entry: Entry }) {
   const url = useObjectUrl(entry.file);
   const video = entry.info.video.length > 0;
   return (
-    <div className="flex aspect-video w-32 shrink-0 items-center justify-center overflow-hidden rounded-md border-3 border-ink bg-ink sm:w-40">
+    <div className="flex aspect-video w-32 shrink-0 items-center justify-center overflow-hidden rounded-md border-2 border-ink bg-ink sm:w-40">
       {video && entry.info.canPlay && url ? (
         <video
           src={`${url}#t=0.1`}
@@ -131,7 +131,7 @@ function Thumb({ entry }: { entry: Entry }) {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border-3 border-ink bg-paper-2 px-3 py-2">
+    <div className="rounded-md border-2 border-ink bg-paper-2 px-3 py-2">
       <p className="text-xs text-ink-3">{label}</p>
       <p className="truncate text-lg leading-tight" title={value}>
         {value}
@@ -163,7 +163,7 @@ function InfoCard({ entry, onRemove }: { entry: Entry; onRemove: () => void }) {
     .filter((s) => s.rows.length);
 
   return (
-    <section aria-label={info.name} className="space-y-5 rounded-lg border-3 border-ink bg-card p-4 shadow-pop sm:p-5">
+    <section aria-label={info.name} className="space-y-5 rounded-lg border-2 border-ink bg-card p-4 sm:p-5">
       <header className="flex items-center gap-4">
         <Thumb entry={entry} />
         <div className="min-w-0 flex-1 space-y-1">
@@ -206,7 +206,7 @@ function InfoCard({ entry, onRemove }: { entry: Entry; onRemove: () => void }) {
 
       <div className="grid gap-3 sm:grid-cols-2">
         {details.map((section) => (
-          <div key={section.title} className="overflow-hidden rounded-md border-3 border-ink">
+          <div key={section.title} className="overflow-hidden rounded-md border-2 border-ink">
             <h3 className="border-b-3 border-ink bg-paper-2 px-3 py-1.5 text-xs tracking-wide uppercase">
               {section.title}
             </h3>
@@ -250,7 +250,7 @@ function Capabilities() {
     : null;
 
   return (
-    <section className="rounded-lg border-3 border-ink bg-card">
+    <section className="rounded-lg border-2 border-ink bg-card">
       <button
         type="button"
         aria-expanded={open}

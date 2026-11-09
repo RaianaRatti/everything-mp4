@@ -137,7 +137,7 @@ export function ExportDialog({
       aria-modal
       aria-label={heading}
     >
-      <div className="max-h-full w-full max-w-lg space-y-4 overflow-y-auto rounded-lg border-3 border-ink bg-card p-5 shadow-pop">
+      <div className="max-h-full w-full max-w-lg space-y-4 overflow-y-auto rounded-lg border-2 border-ink bg-card p-5 shadow-pop-sm">
         <div className="flex items-center gap-1">
           <h2 className="text-xl">{heading}</h2>
           <span className="flex-1" />
@@ -236,7 +236,7 @@ function Progress({
 
   return (
     <>
-      <div className="h-5 overflow-hidden rounded-md border-3 border-ink bg-paper-3">
+      <div className="h-5 overflow-hidden rounded-md border-2 border-ink bg-paper-3">
         <div
           className="h-full bg-accent transition-[width] duration-200"
           style={{ width: `${fraction * 100}%` }}
@@ -293,7 +293,7 @@ function Result({
       </p>
 
       {files.length > 1 && (
-        <ul className="max-h-40 space-y-1 overflow-y-auto rounded-md border-3 border-ink p-2 text-sm">
+        <ul className="max-h-40 space-y-1 overflow-y-auto rounded-md border-2 border-ink p-2 text-sm">
           {files.map((f, i) => (
             <li key={`${f.name}-${i}`} className="flex items-center gap-2">
               <span className="min-w-0 flex-1 truncate" title={f.name}>
@@ -358,7 +358,7 @@ export function BlobPreview({ blob }: { blob: Blob }) {
   if (!url) return null;
   if (failed) {
     return (
-      <p className="rounded-md border-3 border-ink bg-paper-2 p-3 text-sm text-ink-2">
+      <p className="rounded-md border-2 border-ink bg-paper-2 p-3 text-sm text-ink-2">
         This browser can't play this format, so there's no preview. The file itself is fine.
       </p>
     );
@@ -370,7 +370,7 @@ export function BlobPreview({ blob }: { blob: Blob }) {
         src={url}
         alt="Result"
         onError={() => setFailed(true)}
-        className="max-h-80 w-full rounded-md border-3 border-ink bg-paper-3 object-contain"
+        className="max-h-80 w-full rounded-md border-2 border-ink bg-paper-3 object-contain"
       />
     );
   }
@@ -381,7 +381,7 @@ export function BlobPreview({ blob }: { blob: Blob }) {
         kind={type.startsWith("audio/") ? "audio" : "video"}
         small
         fallback={
-          <p className="rounded-md border-3 border-ink bg-paper-2 p-3 text-sm text-ink-2">
+          <p className="rounded-md border-2 border-ink bg-paper-2 p-3 text-sm text-ink-2">
             No preview for this format. The file itself is fine.
           </p>
         }

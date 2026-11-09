@@ -17,7 +17,7 @@ export function CropPreview({
   return (
     <div className="mx-auto max-h-80 w-full max-w-md">
       <div
-        className="relative w-full overflow-hidden rounded-md border-3 border-ink bg-black"
+        className="relative w-full overflow-hidden rounded-md border-2 border-ink bg-black"
         style={{ aspectRatio: `${box.width} / ${box.height}` }}
       >
         <video

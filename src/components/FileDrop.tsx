@@ -172,8 +172,8 @@ export function FileDrop<T>({
     <div className="space-y-3">
       <div
         {...dropProps}
-        className={`flex flex-col items-center justify-center gap-4 rounded-xl border-3 border-dashed border-ink px-6 py-16 text-center sm:py-20 ${
-          over ? "bg-accent" : "bg-card"
+        className={`flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed px-6 py-16 text-center transition-colors sm:py-20 ${
+          over ? "border-ink bg-accent" : "border-ink-3/50 bg-card"
         }`}
       >
         <p className="text-2xl">
@@ -184,7 +184,7 @@ export function FileDrop<T>({
           type="button"
           disabled={disabled}
           onClick={() => input.current?.click()}
-          className="pop-press rounded-md border-3 border-ink bg-ink px-5 py-2.5 text-paper shadow-pop-sm"
+          className="pop-press rounded-md border-2 border-ink bg-ink px-5 py-2.5 text-paper"
         >
           {multiple ? "choose files" : "choose file"}
         </button>

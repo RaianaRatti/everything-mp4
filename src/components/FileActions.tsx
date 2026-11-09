@@ -8,7 +8,7 @@ import { createContext, useContext, type ReactNode } from "react";
 export const FileActionsContext = createContext<ReactNode>(null);
 
 export const roundButton =
-  "flex size-9 items-center justify-center rounded-full border-2 border-ink bg-card shadow-pop-sm hover:bg-accent disabled:opacity-50";
+  "flex size-9 items-center justify-center border-2 border-ink bg-card hover:bg-accent disabled:opacity-50";
 
 /** The corner buttons of a chosen file: replace/add (from the tool) and remove. */
 export function FileActions({

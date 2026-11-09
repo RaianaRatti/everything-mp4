@@ -149,7 +149,7 @@ export default function Convert() {
                 key={p.id}
                 type="button"
                 onClick={() => update({ ...DEFAULTS, ...p.settings })}
-                className="rounded-md border-3 border-ink bg-card px-3 py-1.5 text-left text-sm hover:bg-accent"
+                className="rounded-md border-2 border-ink bg-card px-3 py-1.5 text-left text-sm hover:bg-accent"
               >
                 {p.label}
                 <span className="block text-xs text-ink-3">{p.note}</span>
@@ -260,7 +260,7 @@ function Settings({
   const audioCodecs = audioCodecsFor(format, abilities);
 
   return (
-    <div className="divide-y-3 divide-ink rounded-lg border-3 border-ink bg-card">
+    <div className="divide-y divide-line rounded-lg border-2 border-ink bg-card">
       <PanelSection title="convert to">
         <Select
           label="Format"

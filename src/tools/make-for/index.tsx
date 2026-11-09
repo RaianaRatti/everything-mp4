@@ -190,7 +190,7 @@ function FramePreview({
   const objectFit = fit === "crop" ? "cover" : fit === "stretch" ? "fill" : "contain";
   return (
     <div
-      className="relative mx-auto max-h-[60vh] overflow-hidden rounded-md border-3 border-ink bg-black"
+      className="relative mx-auto max-h-[60vh] overflow-hidden rounded-md border-2 border-ink bg-black"
       style={{ aspectRatio: `${width} / ${height}`, height: height > width ? "60vh" : undefined, width: height > width ? undefined : "100%" }}
     >
       {fit === "blur" && (

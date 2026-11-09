@@ -76,7 +76,7 @@ export function Settings() {
   ];
 
   return (
-    <div className="divide-y-3 divide-ink rounded-lg border-3 border-ink bg-card">
+    <div className="divide-y divide-line rounded-lg border-2 border-ink bg-card">
       {count > 1 && (
         <PanelSection title="layout">
           <Segmented

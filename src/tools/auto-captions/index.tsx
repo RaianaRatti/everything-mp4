@@ -130,7 +130,7 @@ export default function AutoCaptions() {
 
   const sidebar = media ? (
     <>
-      <div className="divide-y-3 divide-ink rounded-lg border-3 border-ink bg-card">
+      <div className="divide-y divide-line rounded-lg border-2 border-ink bg-card">
         <PanelSection title="auto captions">
           <Field label="model">
             <Segmented
@@ -213,13 +213,13 @@ export default function AutoCaptions() {
               exclude="auto-captions"
             />
           </div>
-          <ol className="max-h-[50vh] space-y-1 overflow-y-auto rounded-md border-3 border-ink bg-card p-2">
+          <ol className="max-h-[50vh] space-y-1 overflow-y-auto rounded-md border-2 border-ink bg-card p-2">
             {cues.map((c, i) => (
               <li key={i}>
                 <button
                   type="button"
                   onClick={() => player.seek(c.start)}
-                  className="flex w-full gap-3 rounded px-1 py-0.5 text-left text-sm hover:bg-accent"
+                  className="flex w-full gap-3 rounded-sm px-1 py-0.5 text-left text-sm hover:bg-accent"
                 >
                   <span className="shrink-0 text-ink-3">{formatTime(c.start, 0)}</span>
                   {c.text}

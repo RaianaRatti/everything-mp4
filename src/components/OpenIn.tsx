@@ -66,7 +66,7 @@ export function OpenIn({
       {open && (
         <ul
           role="menu"
-          className="absolute top-full right-0 z-50 mt-1 max-h-72 w-48 overflow-y-auto rounded-md border-3 border-ink bg-card py-1 shadow-pop-sm"
+          className="absolute top-full right-0 z-50 mt-1 max-h-72 w-48 overflow-y-auto rounded-md border-2 border-ink bg-card py-1 shadow-pop-sm"
         >
           {list.map((t) => (
             <li key={t.id}>
