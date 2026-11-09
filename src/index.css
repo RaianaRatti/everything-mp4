@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Pixelify Sans", ui-monospace, monospace;
+
+  --color-paper: #fbfaf7;
+  --color-paper-2: #f6f4ef;
+  --color-paper-3: #eeebe4;
+  --color-card: #ffffff;
+  --color-line: #1c1b1a;
+  --color-line-strong: #1c1b1a;
+  --color-ink: #1c1b1a;
+  --color-ink-2: #45423e;
+  --color-ink-3: #77736d;
+
+  /* User-picked highlight; swapped at runtime via <html data-accent>. */
+  --color-accent: #f9c6d8;
+}
+
+:root {
+  color-scheme: light;
+}
+
+[data-accent="pink"] {
+  --color-accent: #f9c6d8;
+}
+[data-accent="blue"] {
+  --color-accent: #b8dcf7;
+}
+[data-accent="yellow"] {
+  --color-accent: #fbeaa0;
+}
+[data-accent="green"] {
+  --color-accent: #bfe8c4;
+}
+[data-accent="grey"] {
+  --color-accent: #cfcfcf;
+}
+
+/* Hard offset shadow in the accent color (falls bottom-left), for boxes that should pop. */
+@utility shadow-pop {
+  box-shadow: -6px 6px 0 0 var(--color-accent);
+}
+@utility shadow-pop-sm {
+  box-shadow: -4px 4px 0 0 var(--color-accent);
+}
+
+/* Lifts away from its shadow on hover and presses into it on click. Pair with shadow-pop(-sm). */
+@utility pop-press {
+  transition:
+    translate 120ms ease-out,
+    box-shadow 120ms ease-out;
+  &:hover:not(:disabled) {
+    translate: 2px -2px;
+    box-shadow: -8px 8px 0 0 var(--color-accent);
+  }
+  &:active:not(:disabled) {
+    translate: -4px 4px;
+    box-shadow: 0 0 0 0 var(--color-accent);
+  }
+}
+
+body {
+  @apply bg-paper font-sans text-ink;
+  /* Faint dot grid, like graph paper. */
+  background-image: radial-gradient(var(--color-paper-3) 1.5px, transparent 1.5px);
+  background-size: 18px 18px;
+}
+
+::selection {
+  @apply bg-accent text-ink;
+}
