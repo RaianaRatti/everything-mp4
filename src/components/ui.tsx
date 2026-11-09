@@ -59,7 +59,8 @@ export function Segmented<T extends string>({
   onChange,
   label,
 }: {
-  value: T;
+  /** null when none of the options is picked. */
+  value: T | null;
   options: Option<T>[];
   onChange: (value: T) => void;
   label: string;

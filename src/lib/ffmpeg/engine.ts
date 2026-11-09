@@ -28,11 +28,13 @@ function files() {
     ? {
         core: `${base}core-mt/ffmpeg-core.js`,
         wasm: `${base}core-mt/ffmpeg-core.wasm`,
+        wasmParts: __ENGINE_WASM_PARTS__["core-mt"] ?? 1,
         worker: `${base}core-mt/ffmpeg-core.worker.js` as string | undefined,
       }
     : {
         core: `${base}core/ffmpeg-core.js`,
         wasm: `${base}core/ffmpeg-core.wasm`,
+        wasmParts: __ENGINE_WASM_PARTS__["core"] ?? 1,
         worker: undefined,
       };
 }
@@ -57,11 +59,15 @@ export async function isEngineCached(): Promise<boolean> {
   }
 }
 
-/** Fetches a file from the engine cache, or downloads (and caches) it with progress. */
+/**
+ * Fetches a file from the engine cache, or downloads (and caches) it with progress. A file served
+ * in `parts` is downloaded as `<url>.part0`, `.part1`, … and joined; it's cached whole under `url`.
+ */
 async function cachedBlobUrl(
   url: string,
   type: string,
   onBytes: (bytes: number, total: number | null) => void,
+  parts = 1,
 ): Promise<string> {
   const absolute = new URL(url, location.href);
   let cache: Cache | null = null;
@@ -78,22 +84,25 @@ async function cachedBlobUrl(
     return URL.createObjectURL(new Blob([blob], { type }));
   }
 
-  const response = await fetch(absolute);
-  if (!response.ok || !response.body) {
-    throw new FriendlyError(
-      "Couldn't download the video engine. Check your connection and try again.",
-    );
-  }
-  const total = Number(response.headers.get("Content-Length")) || null;
-  const reader = response.body.getReader();
   const chunks: Uint8Array<ArrayBuffer>[] = [];
   let received = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value);
-    received += value.length;
-    onBytes(received, total);
+  for (let n = 0; n < parts; n++) {
+    const response = await fetch(parts > 1 ? new URL(`${absolute.href}.part${n}`) : absolute);
+    if (!response.ok || !response.body) {
+      throw new FriendlyError(
+        "Couldn't download the video engine. Check your connection and try again.",
+      );
+    }
+    // The size of a single file is known up front; for parts, the progress estimate is used.
+    const total = parts === 1 ? Number(response.headers.get("Content-Length")) || null : null;
+    const reader = response.body.getReader();
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      received += value.length;
+      onBytes(received, total);
+    }
   }
   const blob = new Blob(chunks, { type });
   await cache
@@ -127,7 +136,7 @@ export function loadEngine(): Promise<FFmpeg> {
         };
         const [core, wasm, worker] = await Promise.all([
           cachedBlobUrl(f.core, "text/javascript", report("core", 130_000)),
-          cachedBlobUrl(f.wasm, "application/wasm", report("wasm", ENGINE_BYTES)),
+          cachedBlobUrl(f.wasm, "application/wasm", report("wasm", ENGINE_BYTES), f.wasmParts),
           f.worker
             ? cachedBlobUrl(f.worker, "text/javascript", report("worker", 2_000))
             : undefined,

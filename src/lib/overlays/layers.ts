@@ -151,6 +151,26 @@ export function drawLayer(ctx: CanvasRenderingContext2D, layer: Layer, w: number
   ctx.restore();
 }
 
+/** A layer's unrotated box as percents of a w×h frame: its center and size. */
+export function layerBounds(layer: Layer, w: number, h: number) {
+  if (layer.kind === "image") {
+    const height = (((layer.width / 100) * w * layer.image.height) / layer.image.width / h) * 100;
+    return { x: layer.x, y: layer.y, width: layer.width, height };
+  }
+  const ctx = document.createElement("canvas").getContext("2d")!;
+  const px = (layer.size / 100) * h;
+  ctx.font = `600 ${px}px ${layer.font}`;
+  const lines = wrapLines(ctx, layer.text, (layer.wrap / 100) * w);
+  const widest = Math.max(...lines.map((l) => ctx.measureText(l).width));
+  const shift = layer.align === "left" ? widest / 2 : layer.align === "right" ? -widest / 2 : 0;
+  return {
+    x: layer.x + (shift / w) * 100,
+    y: layer.y,
+    width: (widest / w) * 100,
+    height: ((px * 1.2 * lines.length) / h) * 100,
+  };
+}
+
 /** Draws one layer into a transparent PNG the size of the frame. */
 export async function layerPng(layer: Layer, w: number, h: number): Promise<File> {
   if (layer.kind === "text") await document.fonts.load(`600 20px ${layer.font}`).catch(() => {});
@@ -178,10 +198,7 @@ export function overlayGraph(layers: Layer[]): string {
         ? `,fade=t=in:st=${l.start}:d=${d}:alpha=1,fade=t=out:st=${(l.end - d).toFixed(3)}:d=${d}:alpha=1`
         : "";
     parts.push(`[${i + 1}:v]format=rgba${fade}[l${i}]`);
-    const x =
-      l.anim === "slide"
-        ? `'if(lt(t,${l.start + d}),-W*(1-(t-${l.start})/${d}),0)'`
-        : "0";
+    const x = l.anim === "slide" ? `'if(lt(t,${l.start + d}),-W*(1-(t-${l.start})/${d}),0)'` : "0";
     const out = i === layers.length - 1 ? "v" : `b${i}`;
     parts.push(`[${base}][l${i}]overlay=x=${x}:y=0:enable=${between(l.start, l.end)}[${out}]`);
     base = out;

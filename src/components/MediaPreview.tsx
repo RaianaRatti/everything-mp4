@@ -19,6 +19,8 @@ type Props = {
   small?: boolean;
   /** Shows a bin in the corner (next to the tool's replace/add button, if any). */
   onRemove?: () => void;
+  /** Draws the video inside a tool's own frame (filling the box) instead of fitting it plainly. */
+  stage?: (video: ReactNode) => ReactNode;
 };
 
 /**
@@ -41,6 +43,7 @@ function Player({
   muted = false,
   small = false,
   onRemove,
+  stage,
 }: Props) {
   const local = useRef<HTMLVideoElement | null>(null);
   const [time, setTime] = useState(0);
@@ -147,18 +150,22 @@ function Player({
       >
         {kind === "audio" && <AudioLines className="size-10 text-ink-3" aria-hidden />}
         {!small && <FileActions onRemove={onRemove} className="absolute top-2 right-2 z-10" />}
-        <video
-          ref={setRef}
-          src={src}
-          preload="auto"
-          playsInline
-          muted={silent}
-          // Previews start over at the end; with a range, the range loop above handles it.
-          loop={!range}
-          onClick={(e) => toggle(e.currentTarget)}
-          onError={() => setFailed(true)}
-          className={kind === "video" ? "max-h-full max-w-full" : "hidden"}
-        />
+        {(stage ?? ((v) => v))(
+          <video
+            ref={setRef}
+            src={src}
+            preload="auto"
+            playsInline
+            muted={silent}
+            // Previews start over at the end; with a range, the range loop above handles it.
+            loop={!range}
+            onClick={(e) => toggle(e.currentTarget)}
+            onError={() => setFailed(true)}
+            className={
+              kind === "video" ? (stage ? "size-full" : "max-h-full max-w-full") : "hidden"
+            }
+          />,
+        )}
       </div>
       <div className="flex items-center gap-3">
         <button

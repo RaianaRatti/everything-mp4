@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { EnginePage } from "../../components/EnginePage";
 import { FilePickerButton } from "../../components/FileDrop";
 import { LayerCanvas } from "../../components/LayerCanvas";
@@ -10,6 +10,7 @@ import { outputName } from "../../lib/files";
 import type { MediaFile } from "../../lib/mediaFiles";
 import {
   FONTS,
+  layerBounds,
   layerInputs,
   layerPng,
   overlayGraph,
@@ -25,6 +26,8 @@ export interface WatermarkPreset {
   image: string | null;
   text: string;
   corner: Corner;
+  /** Where it was dragged to (its center, as percents of the frame); overrides `corner`. */
+  pos?: { x: number; y: number } | null;
   margin: number;
   size: number;
   opacity: number;
@@ -52,16 +55,40 @@ export async function watermarkLayer(
   const half = p.size / 2;
   const mx = p.margin;
   const my = (p.margin * w) / h;
-  const x = p.corner === "tl" || p.corner === "bl" ? mx + half : p.corner === "c" ? 50 : 100 - mx - half;
-  const base = { id: 1, x, y: 50, rotation: 0, opacity: p.opacity, ...range, anim: "none" as const };
+  const x =
+    p.corner === "tl" || p.corner === "bl" ? mx + half : p.corner === "c" ? 50 : 100 - mx - half;
+  const base = {
+    id: 1,
+    x,
+    y: 50,
+    rotation: 0,
+    opacity: p.opacity,
+    ...range,
+    anim: "none" as const,
+  };
   if (p.kind === "image" && p.image) {
     const image = await createImageBitmap(await (await fetch(p.image)).blob());
-    const ih = ((p.size / 100) * w * image.height) / image.width / h * 100;
-    const y = p.corner === "tl" || p.corner === "tr" ? my + ih / 2 : p.corner === "c" ? 50 : 100 - my - ih / 2;
-    return { ...base, kind: "image", image, width: p.size, tiled: p.tiled, y, rotation: p.tiled ? -20 : 0 };
+    const ih = (((p.size / 100) * w * image.height) / image.width / h) * 100;
+    const y =
+      p.corner === "tl" || p.corner === "tr"
+        ? my + ih / 2
+        : p.corner === "c"
+          ? 50
+          : 100 - my - ih / 2;
+    return {
+      ...base,
+      kind: "image",
+      image,
+      width: p.size,
+      tiled: p.tiled,
+      y,
+      ...p.pos,
+      rotation: p.tiled ? -20 : 0,
+    };
   }
   const size = Math.max(2, p.size / 5);
-  const y = p.corner === "tl" || p.corner === "tr" ? my + size : p.corner === "c" ? 50 : 100 - my - size;
+  const y =
+    p.corner === "tl" || p.corner === "tr" ? my + size : p.corner === "c" ? 50 : 100 - my - size;
   return {
     ...base,
     kind: "text",
@@ -77,6 +104,7 @@ export async function watermarkLayer(
     align: "center",
     wrap: 90,
     y,
+    ...p.pos,
   };
 }
 
@@ -99,6 +127,7 @@ export default function Watermark() {
   const [layer, setLayer] = useState<{ key: string; layer: Layer } | null>(null);
   const [time, setTime] = useState(0);
   const [saved, setSaved] = useState(false);
+  const stage = useRef<HTMLDivElement>(null);
 
   const video = media?.info.video[0];
   const duration = media?.info.duration ?? 0;
@@ -116,11 +145,56 @@ export default function Watermark() {
     if (!width || !height) return;
     let live = true;
     const [preset, part] = JSON.parse(key) as [WatermarkPreset, { start: number; end: number }];
-    void watermarkLayer(preset, width, height, part).then((l) => live && setLayer({ key, layer: l }));
+    void watermarkLayer(preset, width, height, part).then(
+      (l) => live && setLayer({ key, layer: l }),
+    );
     return () => {
       live = false;
     };
   }, [key, width, height]);
+
+  // While dragging, the layer is moved right away rather than waiting for the rebuild.
+  const shown =
+    layer &&
+    (p.pos && !(layer.layer.kind === "image" && layer.layer.tiled)
+      ? { ...layer.layer, ...p.pos }
+      : layer.layer);
+  const box =
+    shown && width && height && !(shown.kind === "image" && shown.tiled)
+      ? layerBounds(shown, width, height)
+      : null;
+
+  const startDrag = (e: ReactPointerEvent<HTMLElement>) => {
+    const frame = stage.current?.getBoundingClientRect();
+    if (!shown || !box || !frame || e.button !== 0) return;
+    e.preventDefault();
+    const target = e.currentTarget;
+    target.setPointerCapture(e.pointerId);
+    const origin = { x: e.clientX, y: e.clientY, px: shown.x, py: shown.y };
+    // Keeps the whole watermark inside the frame (or centered, if it's bigger than the frame).
+    const clamp = (v: number, size: number) =>
+      size >= 100 ? 50 : Math.min(100 - size / 2, Math.max(size / 2, v));
+    const offset = box.x - shown.x;
+    const onMove = (ev: PointerEvent) => {
+      const x =
+        clamp(origin.px + offset + ((ev.clientX - origin.x) / frame.width) * 100, box.width) -
+        offset;
+      const y = clamp(origin.py + ((ev.clientY - origin.y) / frame.height) * 100, box.height);
+      setP((prev) => ({
+        ...prev,
+        pos: { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 },
+      }));
+      setSaved(false);
+    };
+    const onUp = () => {
+      target.removeEventListener("pointermove", onMove);
+      target.removeEventListener("pointerup", onUp);
+      target.removeEventListener("pointercancel", onUp);
+    };
+    target.addEventListener("pointermove", onMove);
+    target.addEventListener("pointerup", onUp);
+    target.addEventListener("pointercancel", onUp);
+  };
 
   const settings = media && video && (
     <PanelSection title="watermark">
@@ -154,11 +228,11 @@ export default function Watermark() {
           {p.image ? "change image" : "pick an image (PNG, JPEG, WebP, SVG)"}
         </FilePickerButton>
       )}
-      <Field label="where">
+      <Field label={p.pos ? "where (dragged — or pick a spot)" : "where (or drag it on the video)"}>
         <Segmented
           label="Where"
-          value={p.corner}
-          onChange={(corner) => update({ corner })}
+          value={p.pos ? null : p.corner}
+          onChange={(corner) => update({ corner, pos: null })}
           options={[
             { value: "tl", label: "↖" },
             { value: "tr", label: "↗" },
@@ -179,17 +253,19 @@ export default function Watermark() {
           aria-label="Size"
         />
       </Field>
-      <Field label={`margin: ${p.margin}%`}>
-        <input
-          type="range"
-          min={0}
-          max={15}
-          value={p.margin}
-          onChange={(e) => update({ margin: Number(e.target.value) })}
-          className="w-full accent-black"
-          aria-label="Margin"
-        />
-      </Field>
+      {!p.pos && (
+        <Field label={`margin: ${p.margin}%`}>
+          <input
+            type="range"
+            min={0}
+            max={15}
+            value={p.margin}
+            onChange={(e) => update({ margin: Number(e.target.value) })}
+            className="w-full accent-black"
+            aria-label="Margin"
+          />
+        </Field>
+      )}
       <Field label={`opacity: ${Math.round(p.opacity * 100)}%`}>
         <input
           type="range"
@@ -203,7 +279,11 @@ export default function Watermark() {
         />
       </Field>
       {p.kind === "image" && (
-        <Checkbox checked={p.tiled} onChange={(tiled) => update({ tiled })} label="repeat across the video" />
+        <Checkbox
+          checked={p.tiled}
+          onChange={(tiled) => update({ tiled })}
+          label="repeat across the video"
+        />
       )}
       <Checkbox
         checked={partOnly}
@@ -270,13 +350,47 @@ export default function Watermark() {
     >
       {media && video && (
         <>
-          <OverlayPreview onRemove={() => setMedia(null)} file={media.file} width={video.width} height={video.height} onTime={setTime}>
-            {layer && (
-              <LayerCanvas layers={[layer.layer]} width={video.width} height={video.height} time={time} />
-            )}
+          <OverlayPreview
+            onRemove={() => setMedia(null)}
+            file={media.file}
+            width={video.width}
+            height={video.height}
+            onTime={setTime}
+          >
+            <div ref={stage} className="absolute inset-0">
+              {shown && (
+                <LayerCanvas
+                  layers={[shown]}
+                  width={video.width}
+                  height={video.height}
+                  time={time}
+                />
+              )}
+              {box && time >= span.start && time <= span.end && (
+                <div
+                  role="button"
+                  tabIndex={-1}
+                  aria-label="Drag to move the watermark"
+                  title="drag to move"
+                  onPointerDown={startDrag}
+                  className="pointer-events-auto absolute cursor-move touch-none rounded-sm outline-2 outline-white/0 outline-dashed hover:outline-white/80 active:outline-white/80"
+                  style={{
+                    left: `${box.x - box.width / 2}%`,
+                    top: `${box.y - box.height / 2}%`,
+                    width: `${box.width}%`,
+                    height: `${box.height}%`,
+                  }}
+                />
+              )}
+            </div>
           </OverlayPreview>
           {partOnly && (
-            <RangeFields start={range.start} end={range.end} duration={duration} onChange={setRange} />
+            <RangeFields
+              start={range.start}
+              end={range.end}
+              duration={duration}
+              onChange={setRange}
+            />
           )}
         </>
       )}

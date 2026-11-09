@@ -77,7 +77,8 @@ export default function Slideshow() {
   const [fit, setFit] = useState<Fit>("blur");
   const [zoom, setZoom] = useState(true);
   const [transition, setTransition] = useState<Transition>("fade");
-  const [fade, setFade] = useState(0.8);
+  // Seconds each transition takes.
+  const fade = 0.8;
   const [shape, setShape] = useState<Shape>("16:9");
   const [music, setMusic] = useState<{ file: File; duration: number } | null>(null);
   const [fitMusic, setFitMusic] = useState(false);

@@ -61,7 +61,8 @@ export function EnginePage({
   children?: ReactNode;
   action: string;
   running: string;
-  disabled?: string | false;
+  /** A reason shown above the button, or just true to grey it out quietly. */
+  disabled?: string | boolean;
   jobs: () => EngineJob[] | Promise<EngineJob[]>;
   notes?: string[];
   renderResult?: (result: JobResult) => ReactNode;
@@ -91,7 +92,9 @@ export function EnginePage({
           {settings}
         </div>
       )}
-      {disabled && <p className="text-sm text-red-700">{disabled}</p>}
+      {typeof disabled === "string" && disabled && (
+        <p className="text-sm text-red-700">{disabled}</p>
+      )}
       {!ready && <EnginePanel reason="This tool uses the video engine." />}
       <ActionButton disabled={status !== "ready" || !!disabled} onClick={() => setOpen(true)}>
         {action}
@@ -108,11 +111,7 @@ export function EnginePage({
       <FileActionsContext.Provider value={media.length && !multiple ? drop : null}>
         {children}
       </FileActionsContext.Provider>
-      {!media.length ? (
-        drop
-      ) : (
-        multiple && <div className="flex justify-end">{drop}</div>
-      )}
+      {!media.length ? drop : multiple && <div className="flex justify-end">{drop}</div>}
       {open && (
         <ExportDialog
           running={running}
@@ -168,6 +167,7 @@ export function Player({
   range,
   playbackRate,
   onRemove,
+  stage,
 }: {
   media: MediaFile;
   player: { ref: RefObject<HTMLVideoElement | null>; setTime: (t: number) => void };
@@ -175,6 +175,7 @@ export function Player({
   playbackRate?: number;
   /** Shows a remove button on the card used for files this browser can't play. */
   onRemove?: () => void;
+  stage?: (video: ReactNode) => ReactNode;
 }) {
   const url = useObjectUrl(media.file);
   if (!media.info.canPlay || !url)
@@ -188,6 +189,7 @@ export function Player({
       onTime={player.setTime}
       range={range}
       playbackRate={playbackRate}
+      stage={stage}
     />
   );
 }

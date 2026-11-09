@@ -4,7 +4,7 @@ import { TimeInput } from "./TimeInput";
 /** Shortest part that can be picked, in seconds. */
 const MIN_LENGTH = 0.1;
 
-/** "from" and "to" time fields for picking part of a file, with its length and a "use all" link. */
+/** "from" and "to" time fields for picking part of a file, with its length. */
 export function RangeFields({
   start,
   end,
@@ -31,15 +31,6 @@ export function RangeFields({
         }
       />
       <p className="pb-2 text-sm text-ink-2">= {formatTime(end - start)}</p>
-      {(start > 0 || end < duration) && (
-        <button
-          type="button"
-          onClick={() => onChange({ start: 0, end: duration })}
-          className="pb-2 text-sm text-ink-3 underline hover:text-ink"
-        >
-          use all
-        </button>
-      )}
     </div>
   );
 }
