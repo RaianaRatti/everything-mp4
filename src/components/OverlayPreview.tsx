@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode, Ref } from "react";
 import { useObjectUrl } from "../lib/objectUrl";
 import { FileActions } from "./FileActions";
 
@@ -14,6 +14,7 @@ export function OverlayPreview({
   videoStyle,
   onTime,
   onRemove,
+  videoRef,
 }: {
   file: File;
   width: number;
@@ -22,6 +23,8 @@ export function OverlayPreview({
   videoStyle?: CSSProperties;
   onTime?: (seconds: number) => void;
   onRemove?: () => void;
+  /** The preview's video element, for drawing its frames elsewhere. */
+  videoRef?: Ref<HTMLVideoElement>;
 }) {
   const url = useObjectUrl(file);
   if (!url) return null;
@@ -35,6 +38,7 @@ export function OverlayPreview({
       }}
     >
       <video
+        ref={videoRef}
         src={url}
         controls
         playsInline

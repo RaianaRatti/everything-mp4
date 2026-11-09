@@ -1,5 +1,11 @@
 import { Plus, X } from "lucide-react";
-import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type RefObject,
+} from "react";
 import { EnginePage } from "../../components/EnginePage";
 import { OverlayPreview } from "../../components/OverlayPreview";
 import { RangeFields } from "../../components/RangeFields";
@@ -9,6 +15,7 @@ import { ENCODE_MP4, even, lerpExpr } from "../../lib/ffmpeg/edit";
 import { outputName } from "../../lib/files";
 import { moveRect, resizeRect, type Corner, type Rect } from "../../lib/layout";
 import type { MediaFile } from "../../lib/mediaFiles";
+import { isTyping } from "../../lib/keys";
 import { formatTime } from "../../lib/time";
 
 type Effect = "blur" | "pixelate" | "solid";
@@ -87,6 +94,66 @@ function positionAt(r: Region, t: number): { x: number; y: number } {
   return k[k.length - 1]!;
 }
 
+/**
+ * Pixelate's block size in pixels for a pw×ph region of a frame w pixels wide: about six blocks
+ * across the region's short side, so it really is unreadable.
+ */
+function pixelBlock(pw: number, ph: number, w: number): number {
+  return Math.max(4, Math.round(w / 60), Math.round(Math.min(pw, ph) / 6));
+}
+
+/** How many blocks a pixelated region has across and down. */
+function pixelGrid(pw: number, ph: number, w: number) {
+  const block = pixelBlock(pw, ph, w);
+  return { cols: Math.max(1, Math.round(pw / block)), rows: Math.max(1, Math.round(ph / block)) };
+}
+
+/**
+ * The live pixelate preview: the region's part of each video frame, shrunk to one pixel per
+ * block and stretched back up without smoothing, like the export.
+ */
+function Pixelated({
+  video,
+  sx,
+  sy,
+  sw,
+  sh,
+  frameWidth,
+}: {
+  video: RefObject<HTMLVideoElement | null>;
+  sx: number;
+  sy: number;
+  sw: number;
+  sh: number;
+  frameWidth: number;
+}) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const { cols, rows } = pixelGrid(sw, sh, frameWidth);
+  useEffect(() => {
+    let raf = 0;
+    const draw = () => {
+      const v = video.current;
+      const ctx = ref.current?.getContext("2d");
+      if (v && ctx && v.readyState >= 2) {
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(v, sx, sy, sw, sh, 0, 0, cols, rows);
+      }
+      raf = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, [video, sx, sy, sw, sh, cols, rows]);
+  return (
+    <canvas
+      ref={ref}
+      width={cols}
+      height={rows}
+      className="size-full"
+      style={{ imageRendering: "pixelated" }}
+    />
+  );
+}
+
 /** A white-on-transparent shape the size of the region, used to give it round or soft edges. */
 async function maskPng(r: Region, pw: number, ph: number): Promise<File> {
   const canvas = document.createElement("canvas");
@@ -120,7 +187,10 @@ export default function BlurRegion() {
   /** Drawing a hand-drawn shape for the active region, and the line so far (percents). */
   const [drawing, setDrawing] = useState(false);
   const [stroke, setStroke] = useState<{ x: number; y: number }[] | null>(null);
+  /** Whether the active region is picked on the video (outlined, with handles). */
+  const [picked, setPicked] = useState(false);
   const stage = useRef<HTMLDivElement>(null);
+  const videoEl = useRef<HTMLVideoElement>(null);
 
   const video = media?.info.video[0];
   const duration = media?.info.duration ?? 0;
@@ -129,8 +199,40 @@ export default function BlurRegion() {
     setRegions(regions.map((r, i) => (i === active ? { ...r, ...patch } : r)));
   const select = (i: number) => {
     setActive(i);
+    setPicked(true);
     setDrawing(false);
   };
+  const remove = (i: number) => {
+    setRegions(regions.filter((_, k) => k !== i));
+    setActive(Math.max(0, i - 1));
+    setPicked(false);
+    setDrawing(false);
+  };
+
+  // Delete or Backspace removes the picked region.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.key !== "Delete" && e.key !== "Backspace") || !picked || drawing) return;
+      if (isTyping(e.target) || !regions[active]) return;
+      e.preventDefault();
+      setRegions(regions.filter((_, k) => k !== active));
+      setActive(Math.max(0, active - 1));
+      setPicked(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [picked, drawing, regions, active]);
+
+  // Clicking anywhere but the region (or its settings) unpicks it.
+  useEffect(() => {
+    if (!picked) return;
+    const onDown = (e: PointerEvent) => {
+      if ((e.target as HTMLElement).closest?.("[data-region], [data-region-settings]")) return;
+      setPicked(false);
+    };
+    document.addEventListener("pointerdown", onDown);
+    return () => document.removeEventListener("pointerdown", onDown);
+  }, [picked]);
   const add = () => {
     setRegions([
       ...regions,
@@ -209,6 +311,7 @@ export default function BlurRegion() {
     const points = pts.map((p) => ({ x: (p.x - box.x) / box.w, y: (p.y - box.y) / box.h }));
     setRegions(regions.map((r, i) => (i === active ? { ...place(r, box, time), points } : r)));
     setDrawing(false);
+    setPicked(true);
   };
 
   const slider = (label: string, key: "x" | "y" | "w" | "h") =>
@@ -229,91 +332,93 @@ export default function BlurRegion() {
   const settings = media && video && (
     <>
       <PanelSection title="regions">
-        <Button onClick={add}>
-          <Plus className="size-4" /> add a region
-        </Button>
-        {region && (
-          <>
-            <Segmented
-              label="Effect"
-              value={region.effect}
-              onChange={(effect) => update({ effect })}
-              options={[
-                { value: "blur", label: "blur" },
-                { value: "pixelate", label: "pixelate" },
-                { value: "solid", label: "black box" },
-              ]}
-            />
-            <Segmented
-              label="Shape"
-              value={region.shape}
-              onChange={(shape) => {
-                update({ shape });
-                setDrawing(shape === "free" && !region.points.length);
-              }}
-              options={[
-                { value: "rect", label: "rectangle" },
-                { value: "ellipse", label: "ellipse" },
-                { value: "free", label: "hand-drawn" },
-              ]}
-            />
-            {region.shape === "free" &&
-              (drawing ? (
-                <div className="space-y-1">
-                  <p className="text-xs text-ink-3">
-                    Draw around what you want to hide, right on the video.
-                  </p>
-                  {region.points.length > 0 && (
-                    <Button variant="ghost" onClick={() => setDrawing(false)}>
-                      keep the old shape
-                    </Button>
-                  )}
-                </div>
-              ) : (
-                <Button onClick={() => setDrawing(true)}>
-                  {region.points.length ? "draw it again" : "draw the shape"}
+        <div data-region-settings className="space-y-3">
+          <Button onClick={add}>
+            <Plus className="size-4" /> add a region
+          </Button>
+          {region && (
+            <>
+              <Segmented
+                label="Effect"
+                value={region.effect}
+                onChange={(effect) => update({ effect })}
+                options={[
+                  { value: "blur", label: "blur" },
+                  { value: "pixelate", label: "pixelate" },
+                  { value: "solid", label: "black box" },
+                ]}
+              />
+              <Segmented
+                label="Shape"
+                value={region.shape}
+                onChange={(shape) => {
+                  update({ shape });
+                  setDrawing(shape === "free" && !region.points.length);
+                }}
+                options={[
+                  { value: "rect", label: "rectangle" },
+                  { value: "ellipse", label: "ellipse" },
+                  { value: "free", label: "hand-drawn" },
+                ]}
+              />
+              {region.shape === "free" &&
+                (drawing ? (
+                  <div className="space-y-1">
+                    <p className="text-xs text-ink-3">
+                      Draw around what you want to hide, right on the video.
+                    </p>
+                    {region.points.length > 0 && (
+                      <Button variant="ghost" onClick={() => setDrawing(false)}>
+                        keep the old shape
+                      </Button>
+                    )}
+                  </div>
+                ) : (
+                  <Button onClick={() => setDrawing(true)}>
+                    {region.points.length ? "draw it again" : "draw the shape"}
+                  </Button>
+                ))}
+              <Checkbox
+                checked={region.soft}
+                onChange={(soft) => update({ soft })}
+                label="soft edges"
+              />
+              {slider("left", "x")}
+              {slider("top", "y")}
+              {slider("width", "w")}
+              {slider("height", "h")}
+              <RangeFields
+                start={region.start}
+                end={region.end}
+                duration={duration}
+                onChange={(r) => update(r)}
+              />
+              <div className="space-y-1">
+                <Button
+                  onClick={() =>
+                    update({
+                      keys: [
+                        ...region.keys.filter((k) => Math.abs(k.t - time) > 0.05),
+                        { t: time, x: region.x, y: region.y },
+                      ],
+                    })
+                  }
+                >
+                  pin this position at {formatTime(time)}
                 </Button>
-              ))}
-            <Checkbox
-              checked={region.soft}
-              onChange={(soft) => update({ soft })}
-              label="soft edges"
-            />
-            {slider("left", "x")}
-            {slider("top", "y")}
-            {slider("width", "w")}
-            {slider("height", "h")}
-            <RangeFields
-              start={region.start}
-              end={region.end}
-              duration={duration}
-              onChange={(r) => update(r)}
-            />
-            <div className="space-y-1">
-              <Button
-                onClick={() =>
-                  update({
-                    keys: [
-                      ...region.keys.filter((k) => Math.abs(k.t - time) > 0.05),
-                      { t: time, x: region.x, y: region.y },
-                    ],
-                  })
-                }
-              >
-                pin this position at {formatTime(time)}
-              </Button>
-              <p className="text-xs text-ink-3">
-                For something that moves: pin its position at a few times and the region slides
-                between them.
-              </p>
-              {region.keys.length > 0 && (
-                <Button variant="ghost" onClick={() => update({ keys: [] })}>
-                  clear {region.keys.length} pinned positions
-                </Button>
-              )}
-            </div>
-          </>
-        )}
+                <p className="text-xs text-ink-3">
+                  For something that moves: pin its position at a few times and the region slides
+                  between them.
+                </p>
+                {region.keys.length > 0 && (
+                  <Button variant="ghost" onClick={() => update({ keys: [] })}>
+                    clear {region.keys.length} pinned positions
+                  </Button>
+                )}
+              </div>
+            </>
+          )}
+        </div>
       </PanelSection>
       {media.info.audio.length > 0 && (
         <PanelSection title="sound while hidden">
@@ -349,7 +454,7 @@ export default function BlurRegion() {
         r.effect === "blur"
           ? `boxblur=luma_radius=${radius}:luma_power=3:chroma_radius=${Math.max(1, Math.floor(radius / 2))}:chroma_power=3`
           : r.effect === "pixelate"
-            ? `scale=${Math.max(1, Math.round(pw / 16))}:${Math.max(1, Math.round(ph / 16))},scale=${pw}:${ph}:flags=neighbor`
+            ? `scale=${pixelGrid(pw, ph, W).cols}:${pixelGrid(pw, ph, W).rows}:flags=area,scale=${pw}:${ph}:flags=neighbor`
             : `drawbox=x=0:y=0:w=${pw}:h=${ph}:color=black:t=fill`;
       parts.push(
         `[${base}]split[a${i}][b${i}]`,
@@ -428,16 +533,20 @@ export default function BlurRegion() {
             width={video.width}
             height={video.height}
             onTime={setTime}
+            videoRef={videoEl}
           >
             <div ref={stage} className="absolute inset-0">
               {regions.map((r, i) => {
                 if (time < r.start || time > r.end) return null;
+                // While it's being drawn again, the old shape is hidden.
+                if (drawing && i === active) return null;
                 const at = positionAt(r, time);
                 const drawn = isDrawn(r);
-                const isActive = i === active;
+                const isActive = i === active && picked;
                 return (
                   <div
                     key={r.id}
+                    data-region
                     role="button"
                     tabIndex={-1}
                     aria-label={`Region ${i + 1}`}
@@ -458,19 +567,27 @@ export default function BlurRegion() {
                     }}
                   >
                     <div
-                      className="absolute inset-0"
+                      className="absolute inset-0 overflow-hidden"
                       style={{
                         borderRadius: "inherit",
                         clipPath: drawn
                           ? `polygon(${r.points.map((p) => `${p.x * 100}% ${p.y * 100}%`).join(",")})`
                           : undefined,
                         background: r.effect === "solid" ? "black" : undefined,
-                        backdropFilter:
-                          r.effect === "solid"
-                            ? undefined
-                            : `blur(${r.effect === "pixelate" ? 6 : 12}px)`,
+                        backdropFilter: r.effect === "blur" ? "blur(12px)" : undefined,
                       }}
-                    />
+                    >
+                      {r.effect === "pixelate" && (
+                        <Pixelated
+                          video={videoEl}
+                          sx={(at.x / 100) * video.width}
+                          sy={(at.y / 100) * video.height}
+                          sw={(r.w / 100) * video.width}
+                          sh={(r.h / 100) * video.height}
+                          frameWidth={video.width}
+                        />
+                      )}
+                    </div>
                     {drawn && isActive && (
                       <svg
                         viewBox="0 0 100 100"
@@ -538,6 +655,7 @@ export default function BlurRegion() {
               {regions.map((r, i) => (
                 <span
                   key={r.id}
+                  data-region
                   className={`inline-flex items-center gap-1 rounded-md border-3 border-ink px-2 py-1 text-sm ${
                     i === active ? "bg-accent" : "bg-card"
                   }`}
@@ -545,14 +663,7 @@ export default function BlurRegion() {
                   <button type="button" onClick={() => select(i)}>
                     region {i + 1}
                   </button>
-                  <button
-                    type="button"
-                    aria-label="Remove region"
-                    onClick={() => {
-                      setRegions(regions.filter((_, k) => k !== i));
-                      select(0);
-                    }}
-                  >
+                  <button type="button" aria-label="Remove region" onClick={() => remove(i)}>
                     <X className="size-3.5" />
                   </button>
                 </span>
