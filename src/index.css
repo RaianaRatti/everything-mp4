@@ -76,6 +76,23 @@
   }
 }
 
+/* Playback bar on Home's drop screen: fills in 24 frame-like steps. */
+@keyframes scrub {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+@utility animate-scrub {
+  animation: scrub 12s steps(24, end) infinite;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    width: 40%;
+  }
+}
+
 body {
   @apply bg-paper font-sans text-ink;
 }
